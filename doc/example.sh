@@ -14,6 +14,7 @@ function __main {
   dybatpho::info "This is example script that used dybatpho"
   dybatpho::start_trace
   dybatpho::breakpoint
+  dybatpho::die "Test" 1
   whoami
   dybatpho::pause_trace
   dybatpho::end_trace
@@ -21,5 +22,5 @@ function __main {
 }
 
 # shellcheck disable=SC2034
-LOG_LEVEL=trace
+LOG_LEVEL=debug
 __main

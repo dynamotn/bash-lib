@@ -114,32 +114,34 @@ function dybatpho::success {
 #######################################
 # @description Show warning message.
 # @arg $1 string Message
+# @arg $2 string Indicator of message, default is `<invoke file>:<line number of invoke file>`
 # @stderr Show message if log level of message is less than warning level
 #######################################
-function dybatpho::warning {
-  __log warning "WARNING: ${1}" stderr
+function dybatpho::warn {
+  local indicator=${2:-"${BASH_SOURCE[-1]}:${BASH_LINENO[0]}"}
+  __log warn "$(date +"%FT%T") ${indicator} [WARNING]: ${1}" stderr
 }
 
 #######################################
 # @description Show error message.
 # @arg $1 string Message
+# @arg $2 string Indicator of message, default is `<invoke file>:<line number of invoke file>`
 # @stderr Show message if log level of message is less than error level
 #######################################
 function dybatpho::error {
-  __log error "ERROR: ${1}" stderr
+  local indicator=${2:-"${BASH_SOURCE[-1]}:${BASH_LINENO[0]}"}
+  __log error "$(date +"%FT%T") ${indicator} [ERROR]: ${1}" stderr
 }
 
 #######################################
 # @description Show fatal message and exit process.
 # @arg $1 string Message
-# @arg $2 number Exit code, default is 1
+# @arg $2 string Indicator of message, default is `<invoke file>:<line number of invoke file>`
 # @stderr Show message if log level of message is less than fatal level
-# @exitcode $2 Stop to process anything else
 #######################################
 function dybatpho::fatal {
-  local exit_code=${2:-1}
-  __log fatal "FATAL: ${1}" stderr
-  exit "$exit_code"
+  local indicator=${2:-"${BASH_SOURCE[-1]}:${BASH_LINENO[0]}"}
+  __log fatal "$(date +"%FT%T") ${indicator} [FATAL]: ${1}" stderr
 }
 
 #######################################
@@ -147,7 +149,7 @@ function dybatpho::fatal {
 # @noargs
 #######################################
 function dybatpho::start_trace {
-  [ "$LOG_LEVEL" != "trace" ] && return
+  [ "$LOG_LEVEL" != "trace" ] && return 1
   __log trace "START TRACE" stderr
   export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   trap 'set +x' EXIT
@@ -159,7 +161,7 @@ function dybatpho::start_trace {
 # @noargs
 #######################################
 function dybatpho::pause_trace {
-  [ "$LOG_LEVEL" != "trace" ] && return
+  [ "$LOG_LEVEL" != "trace" ] && return 1
   read -n 1 -s -r -p "Press any key to continue"
 }
 
@@ -168,7 +170,7 @@ function dybatpho::pause_trace {
 # @noargs
 #######################################
 function dybatpho::breakpoint {
-  [ "$LOG_LEVEL" != "trace" ] && return
+  [ "$LOG_LEVEL" != "trace" ] && return 1
   local REPLY
   local help='Breakpoint hit. [hopaAq]\nh: display help\no: list options\np: list parameters\na: list array\nA: list associative array\nq: quit'
   echo -e "$help"
